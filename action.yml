@@ -1,0 +1,25 @@
+name: Dispatched repository Wait
+description: Wait for the result of a other dispatched repository
+author: Microtema
+branding:
+  icon: shield
+  color: purple
+inputs:
+  token:
+    description: GitHub Personal Access Token for making API requests.
+    required: true
+  repo:
+    description: Repository of the action to dispatch.
+    required: true
+  run_id:
+    description: Run ID to await the completion of.
+    required: true
+  run_timeout_seconds:
+    description: Time until giving up on the run.
+    default: 300
+  poll_interval_ms:
+    description: Frequency to poll the run for a status.
+    default: 5000
+runs:
+  using: node16
+  main: dist/index.js

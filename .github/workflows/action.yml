@@ -1,0 +1,30 @@
+name: Action Test
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set target branch
+        run: echo "TARGET_BRANCH=${{ github.ref }}" >> $GITHUB_ENV
+      - name: Set target branch for PR event
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "TARGET_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+      - name: Dispatch and return Run ID
+        id: return_dispatch
+        uses: microtema/workflow-dispatch@v2.0
+        with:
+          token: ${{ secrets.TOKEN }}
+          ref: ${{ env.TARGET_BRANCH }}
+          repo: microtema/return-dispatch
+          workflow: dispatch.yml
+          workflow_inputs: '{"cake":"delicious"}'
+      - name: Await Run ID ${{ steps.return_dispatch.outputs.run_id }}
+        uses: ./
+        with:
+          token: ${{ github.token }}
+          repo: microtema/return-dispatch
+          run_id: ${{ steps.return_dispatch.outputs.run_id }}
