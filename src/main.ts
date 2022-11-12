@@ -1,13 +1,6 @@
-import * as core from "@actions/core";
-import { getConfig } from "./action";
-import {
-  getWorkflowRunActiveJobUrl,
-  getWorkflowRunFailedJobs,
-  getWorkflowRunState,
-  init,
-  WorkflowRunConclusion,
-  WorkflowRunStatus,
-} from "./api";
+import * as core from '@actions/core';
+import {getConfig} from './action';
+import {getWorkflowRunFailedJobs, getWorkflowRunState, init, WorkflowRunConclusion, WorkflowRunStatus,} from './api'
 
 async function logFailureDetails(runId: number): Promise<void> {
   const failedJobs = await getWorkflowRunFailedJobs(runId);
@@ -24,12 +17,12 @@ async function logFailureDetails(runId: number): Promise<void> {
       .join("\n");
     core.error(
       `Job ${failedJob.name}:\n` +
-        `  ID: ${failedJob.id}\n` +
-        `  Status: ${failedJob.status}\n` +
-        `  Conclusion: ${failedJob.conclusion}\n` +
-        `  URL: ${failedJob.url}\n` +
-        `  Steps (non-success):\n` +
-        failedSteps
+      `  ID: ${failedJob.id}\n` +
+      `  Status: ${failedJob.status}\n` +
+      `  Conclusion: ${failedJob.conclusion}\n` +
+      `  URL: ${failedJob.url}\n` +
+      `  Steps (non-success):\n` +
+      failedSteps
     );
   }
 }
@@ -46,24 +39,23 @@ async function run(): Promise<void> {
 
     core.info(
       `Awaiting completion of Workflow Run ${config.runId}...\n` +
-        `  ID: ${config.runId}\n` +
-        `  URL: ${await getWorkflowRunActiveJobUrl(config.runId)}`
+      `  ID: ${config.runId}\n`
     );
 
     while (elapsedTime < timeoutMs) {
       attemptNo++;
       elapsedTime = Date.now() - startTime;
 
-      const { status, conclusion } = await getWorkflowRunState(config.runId);
+      const {status, conclusion} = await getWorkflowRunState(config.runId);
 
       if (status === WorkflowRunStatus.Completed) {
         switch (conclusion) {
           case WorkflowRunConclusion.Success:
             core.info(
               "Run Completed:\n" +
-                `  Run ID: ${config.runId}\n` +
-                `  Status: ${status}\n` +
-                `  Conclusion: ${conclusion}`
+              `  Run ID: ${config.runId}\n` +
+              `  Status: ${status}\n` +
+              `  Conclusion: ${conclusion}`
             );
             return;
           case WorkflowRunConclusion.ActionRequired:
@@ -89,9 +81,7 @@ async function run(): Promise<void> {
       );
     }
 
-    throw new Error(
-      `Timeout exceeded while awaiting completion of Run ${config.runId}`
-    );
+    throw new Error(`Timeout exceeded while awaiting completion of Run ${config.runId}`);
   } catch (error) {
     if (error instanceof Error) {
       core.error(`Failed to complete: ${error.message}`);

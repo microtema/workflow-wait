@@ -41,16 +41,19 @@ export interface ActionConfig {
 }
 
 export function getConfig(): ActionConfig {
+
+  const [owner, repo] = core.getInput('repo').split('/')
+
   return {
     token: core.getInput("token", { required: true }),
-    repo: core.getInput("repo", { required: true }),
-    owner: core.getInput("owner", { required: true }),
-    runId: getRunIdFromValue(core.getInput("run_id")),
+    repo,
+    owner,
+    runId: getRunIdFromValue(core.getInput("runId")),
     runTimeoutSeconds:
-      getNumberFromValue(core.getInput("run_timeout_seconds")) ||
+      getNumberFromValue(core.getInput("runTimeoutSeconds")) ||
       RUN_TIMEOUT_SECONDS,
     pollIntervalMs:
-      getNumberFromValue(core.getInput("poll_interval_ms")) || POLL_INTERVAL_MS,
+      getNumberFromValue(core.getInput("pollIntervalMs")) || POLL_INTERVAL_MS,
   };
 }
 

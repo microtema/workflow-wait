@@ -7551,13 +7551,14 @@ var core = __toESM(require_core());
 var RUN_TIMEOUT_SECONDS = 5 * 60;
 var POLL_INTERVAL_MS = 5e3;
 function getConfig() {
+  const [owner, repo] = core.getInput("repo").split("/");
   return {
     token: core.getInput("token", { required: true }),
-    repo: core.getInput("repo", { required: true }),
-    owner: core.getInput("owner", { required: true }),
-    runId: getRunIdFromValue(core.getInput("run_id")),
-    runTimeoutSeconds: getNumberFromValue(core.getInput("run_timeout_seconds")) || RUN_TIMEOUT_SECONDS,
-    pollIntervalMs: getNumberFromValue(core.getInput("poll_interval_ms")) || POLL_INTERVAL_MS
+    repo,
+    owner,
+    runId: getRunIdFromValue(core.getInput("runId")),
+    runTimeoutSeconds: getNumberFromValue(core.getInput("runTimeoutSeconds")) || RUN_TIMEOUT_SECONDS,
+    pollIntervalMs: getNumberFromValue(core.getInput("pollIntervalMs")) || POLL_INTERVAL_MS
   };
 }
 function getRunIdFromValue(value) {
@@ -7692,35 +7693,6 @@ async function getWorkflowRunFailedJobs(runId) {
     throw error3;
   }
 }
-async function getWorkflowRunActiveJobUrl(runId) {
-  try {
-    const response = await getWorkflowRunJobs(runId);
-    const fetchedInProgressJobs = response.data.jobs.filter(
-      (job) => job.status === "in_progress"
-    );
-    if (fetchedInProgressJobs.length <= 0) {
-      core2.warning(`Failed to find in_progress Jobs for Workflow Run ${runId}`);
-      return "Unable to fetch URL";
-    }
-    core2.debug(
-      `Fetched Jobs for Run:
-  Repository: ${config.owner}/${config.repo}
-  Run ID: ${config.runId}
-  Jobs (in_progress): [${fetchedInProgressJobs.map(
-        (job) => job.name
-      )}]`
-    );
-    return fetchedInProgressJobs[0].html_url || "GitHub failed to return the URL";
-  } catch (error3) {
-    if (error3 instanceof Error) {
-      core2.error(
-        `getWorkflowRunActiveJobUrl: An unexpected error has occurred: ${error3.message}`
-      );
-      error3.stack && core2.debug(error3.stack);
-    }
-    throw error3;
-  }
-}
 
 // src/main.ts
 async function logFailureDetails(runId) {
@@ -7753,7 +7725,7 @@ async function run() {
     core3.info(
       `Awaiting completion of Workflow Run ${config2.runId}...
   ID: ${config2.runId}
-  URL: ${await getWorkflowRunActiveJobUrl(config2.runId)}`
+`
     );
     while (elapsedTime < timeoutMs) {
       attemptNo++;
@@ -7789,9 +7761,7 @@ async function run() {
         (resolve) => setTimeout(resolve, config2.pollIntervalMs)
       );
     }
-    throw new Error(
-      `Timeout exceeded while awaiting completion of Run ${config2.runId}`
-    );
+    throw new Error(`Timeout exceeded while awaiting completion of Run ${config2.runId}`);
   } catch (error3) {
     if (error3 instanceof Error) {
       core3.error(`Failed to complete: ${error3.message}`);

@@ -1,12 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
-import {
-  getWorkflowRunActiveJobUrl,
-  getWorkflowRunFailedJobs,
-  getWorkflowRunState,
-  init,
-} from "./api";
+import {getWorkflowRunFailedJobs, getWorkflowRunState, init,} from "./api";
 
 interface MockResponse {
   data: any;
@@ -156,7 +151,7 @@ describe("API", () => {
             })
           );
 
-        const { steps } = (await getWorkflowRunFailedJobs(123456))[0];
+        const {steps} = (await getWorkflowRunFailedJobs(123456))[0];
         expect(steps).toHaveLength(mockData.jobs[0].steps.length);
         for (let i = 0; i < mockSteps.length; i++) {
           expect(steps[i].name).toStrictEqual(mockSteps[i].name);
@@ -181,68 +176,6 @@ describe("API", () => {
             },
           ],
         };
-      });
-
-      it("should return the url for an in_progress workflow run given a run ID", async () => {
-        jest
-          .spyOn(mockOctokit.rest.actions, "listJobsForWorkflowRun")
-          .mockReturnValue(
-            Promise.resolve({
-              data: inProgressMockData,
-              status: 200,
-            })
-          );
-
-        const url = await getWorkflowRunActiveJobUrl(123456);
-        expect(url).toStrictEqual(mockData.jobs[0].html_url);
-      });
-
-      it("should throw if a non-200 status is returned", async () => {
-        const errorStatus = 401;
-        jest
-          .spyOn(mockOctokit.rest.actions, "listJobsForWorkflowRun")
-          .mockReturnValue(
-            Promise.resolve({
-              data: undefined,
-              status: errorStatus,
-            })
-          );
-
-        await expect(getWorkflowRunActiveJobUrl(0)).rejects.toThrow(
-          `Failed to get Jobs for Workflow Run, expected 200 but received ${errorStatus}`
-        );
-      });
-
-      it("should return even if no in_progress job is found", async () => {
-        inProgressMockData.jobs[0].status = "unknown";
-
-        jest
-          .spyOn(mockOctokit.rest.actions, "listJobsForWorkflowRun")
-          .mockReturnValue(
-            Promise.resolve({
-              data: inProgressMockData,
-              status: 200,
-            })
-          );
-
-        const url = await getWorkflowRunActiveJobUrl(123456);
-        expect(url).toStrictEqual("Unable to fetch URL");
-      });
-
-      it("should return even if GitHub fails to return a URL", async () => {
-        inProgressMockData.jobs[0].html_url = null;
-
-        jest
-          .spyOn(mockOctokit.rest.actions, "listJobsForWorkflowRun")
-          .mockReturnValue(
-            Promise.resolve({
-              data: inProgressMockData,
-              status: 200,
-            })
-          );
-
-        const url = await getWorkflowRunActiveJobUrl(123456);
-        expect(url).toStrictEqual("GitHub failed to return the URL");
       });
     });
   });

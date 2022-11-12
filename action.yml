@@ -11,13 +11,13 @@ inputs:
   repo:
     description: Repository of the action to dispatch.
     required: true
-  run_id:
+  runId:
     description: Run ID to await the completion of.
     required: true
-  run_timeout_seconds:
+  runTimeoutSeconds:
     description: Time until giving up on the run.
     default: 300
-  poll_interval_ms:
+  pollIntervalMs:
     description: Frequency to poll the run for a status.
     default: 5000
 runs:
