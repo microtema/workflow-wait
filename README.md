@@ -1,4 +1,4 @@
-# GitHub Action: workflow-dispatch-wait
+# GitHub Action: workflow-wait
 
 Await the completion of a foreign repository Workflow Run given the Run ID.
 
@@ -24,7 +24,7 @@ steps:
       repo: owner/repository-name
       workflow: automation-test.yml
   - name: Await Run ID ${{ steps.return_dispatch.outputs.runId }}
-    uses: microtema/workflow-dispatch-wait@v2.0
+    uses: microtema/workflow-wait@v2.0
     with:
       token: ${{ github.token }}
       repo: owner/repository-name

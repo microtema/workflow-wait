@@ -5,6 +5,7 @@
   "description": "Wait for the result of a other dispatched repository",
   "main": "lib/main.js",
   "scripts": {
+    "build": "npm run build:bundle",
     "build:bundle": "npm run build:types && node ./esbuild.config.mjs",
     "build:types": "tsc",
     "format:check": "prettier --check **/*.ts",

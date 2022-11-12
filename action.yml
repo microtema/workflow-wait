@@ -1,4 +1,4 @@
-name: Dispatched repository Wait
+name: Workflow Wait
 description: Wait for the result of a other dispatched repository
 author: Microtema
 branding:
