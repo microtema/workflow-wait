@@ -61,3 +61,12 @@ For more information please see [api.ts](./src/api.ts).
 ## Where does this help?
 
 If you want to use the result of a Workflow Run from a remote repository to complete a check locally, i.e. you have automated tests on another repository and don't want the local checks to pass if the remote fails.
+
+## Commit, tag, and push your action to GitHub
+
+It's best practice to also add a version tag for releases of your action. For more information on versioning your action, see "About actions."
+
+```
+git tag -a -m "My first action release" v1.1
+git push --follow-tags
+```
