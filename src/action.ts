@@ -42,7 +42,7 @@ export interface ActionConfig {
 
 export function getConfig(): ActionConfig {
 
-  const [owner, repo] = core.getInput('repo').split('/')
+  const [owner, repo] = core.getInput('repo', {required: true}).split('/')
 
   return {
     token: core.getInput("token", {required: true}),

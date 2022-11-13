@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import type {GitHub} from "@actions/github/lib/utils";
-import {ActionConfig, getConfig} from "./action";
+import type { GitHub } from "@actions/github/lib/utils";
+import { ActionConfig, getConfig } from "./action";
 
 type Octokit = InstanceType<typeof GitHub>;
 
@@ -34,30 +34,29 @@ export interface WorkflowRunState {
   conclusion: WorkflowRunConclusion | null;
 }
 
-export async function getWorkflowRunState(runId: number): Promise<WorkflowRunState> {
+export async function getWorkflowRunState(
+  runId: number
+): Promise<WorkflowRunState> {
   try {
     // https://docs.github.com/en/rest/reference/actions#get-a-workflow-run
-
-    const request = {
+    const response = await octokit.rest.actions.getWorkflowRun({
       owner: config.owner,
       repo: config.repo,
       run_id: runId,
-    };
-
-    core.info(`getWorkflowRunState#request: ${JSON.stringify(config)}`)
-
-    const response = await octokit.rest.actions.getWorkflowRun(request);
+    });
 
     if (response.status !== 200) {
-      throw new Error(`Failed to get Workflow Run state, expected 200 but received ${response.status}`);
+      throw new Error(
+        `Failed to get Workflow Run state, expected 200 but received ${response.status}`
+      );
     }
 
     core.debug(
       `Fetched Run:\n` +
-      `  Repository: ${config.owner}/${config.repo}\n` +
-      `  Run ID: ${runId}\n` +
-      `  Status: ${response.data.status}\n` +
-      `  Conclusion: ${response.data.conclusion}`
+        `  Repository: ${config.owner}/${config.repo}\n` +
+        `  Run ID: ${runId}\n` +
+        `  Status: ${response.data.status}\n` +
+        `  Conclusion: ${response.data.conclusion}`
     );
 
     return {
@@ -66,8 +65,9 @@ export async function getWorkflowRunState(runId: number): Promise<WorkflowRunSta
     };
   } catch (error) {
     if (error instanceof Error) {
-      core.error(`getWorkflowRunState: An unexpected error has occurred: ${error.message}`);
-      core.error(`getWorkflowRunState: An unexpected error has occurred: ${JSON.stringify(config)}`);
+      core.error(
+        `getWorkflowRunState: An unexpected error has occurred: ${error.message}`
+      );
       error.stack && core.debug(error.stack);
     }
     throw error;
@@ -91,7 +91,9 @@ export interface WorkflowRunJobStep {
 }
 
 type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
-type ListJobsForWorkflowRunResponse = Awaited<ReturnType<Octokit["rest"]["actions"]["listJobsForWorkflowRun"]>>;
+type ListJobsForWorkflowRunResponse = Awaited<
+  ReturnType<Octokit["rest"]["actions"]["listJobsForWorkflowRun"]>
+>;
 
 async function getWorkflowRunJobs(
   runId: number
@@ -147,19 +149,19 @@ export async function getWorkflowRunFailedJobs(
 
     core.debug(
       `Fetched Jobs for Run:\n` +
-      `  Repository: ${config.owner}/${config.repo}\n` +
-      `  Run ID: ${config.runId}\n` +
-      `  Jobs: [${jobs.map((job) => job.name)}]`
+        `  Repository: ${config.owner}/${config.repo}\n` +
+        `  Run ID: ${config.runId}\n` +
+        `  Jobs: [${jobs.map((job) => job.name)}]`
     );
 
     for (const job of jobs) {
       const steps = job.steps.map((step) => `${step.number}: ${step.name}`);
       core.debug(
         `  Job: ${job.name}\n` +
-        `    ID: ${job.id}\n` +
-        `    Status: ${job.status}\n` +
-        `    Conclusion: ${job.conclusion}\n` +
-        `    Steps: [${steps}]`
+          `    ID: ${job.id}\n` +
+          `    Status: ${job.status}\n` +
+          `    Conclusion: ${job.conclusion}\n` +
+          `    Steps: [${steps}]`
       );
     }
 
