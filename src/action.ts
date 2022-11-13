@@ -45,19 +45,17 @@ export function getConfig(): ActionConfig {
   const [owner, repo] = core.getInput('repo').split('/')
 
   return {
-    token: core.getInput("token", { required: true }),
+    token: core.getInput("token", {required: true}),
     repo,
     owner,
     runId: getRunIdFromValue(core.getInput("runId")),
-    runTimeoutSeconds:
-      getNumberFromValue(core.getInput("runTimeoutSeconds")) ||
-      RUN_TIMEOUT_SECONDS,
-    pollIntervalMs:
-      getNumberFromValue(core.getInput("pollIntervalMs")) || POLL_INTERVAL_MS,
+    runTimeoutSeconds: getNumberFromValue(core.getInput("runTimeoutSeconds")) || RUN_TIMEOUT_SECONDS,
+    pollIntervalMs: getNumberFromValue(core.getInput("pollIntervalMs")) || POLL_INTERVAL_MS,
   };
 }
 
 function getRunIdFromValue(value: string): number {
+
   const id = getNumberFromValue(value);
   if (id === undefined) {
     throw new Error("Run ID must be provided.");
