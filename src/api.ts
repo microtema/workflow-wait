@@ -67,6 +67,7 @@ export async function getWorkflowRunState(runId: number): Promise<WorkflowRunSta
   } catch (error) {
     if (error instanceof Error) {
       core.error(`getWorkflowRunState: An unexpected error has occurred: ${error.message}`);
+      core.error(`getWorkflowRunState: An unexpected error has occurred: ${JSON.stringify(config)}`);
       error.stack && core.debug(error.stack);
     }
     throw error;
